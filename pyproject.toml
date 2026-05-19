@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcptune"
+version = "0.1.0"
+description = "Automatic MCP-based tool-use fine-tuning for LLMs"
+authors = [
+    { name="Tomás Rodrigues" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "pydantic",
+    "httpx",
+    "transformers",
+    "datasets",
+]
+
+[project.scripts]
+mcptune = "mcptune.cli.main:app"
