@@ -15,3 +15,4 @@ class Tool:
     name: str
     description: str
     parameters: list[ToolParameter]
+    outputSchema: ToolParameter
