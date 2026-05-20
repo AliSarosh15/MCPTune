@@ -1,6 +1,36 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# virtual environments
 .venv/
-dist/
+venv/
+
+# build artifacts
 build/
+dist/
 *.egg-info/
+
+# testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# type checker
+.mypy_cache/
+
+# ruff
+.ruff_cache/
+
+# environment variables
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
