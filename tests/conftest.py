@@ -19,6 +19,7 @@ def fastmcp_server() -> FastMCP:
     @mcp.tool
     def add(a: int, b: int) -> int:
         """Add two integers."""
+        #        raise Exception("Something")
         return a + b
 
     return mcp

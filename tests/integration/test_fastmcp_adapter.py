@@ -39,9 +39,7 @@ async def test_raw_schema_is_preserved(adapter):
 
 @pytest.mark.integration
 async def test_call_tool_executes_and_returns_result(adapter):
-    result = await adapter.call_tool("add", {"a": 2, "b": 3})
+    result = await adapter.call_tool("add", {"a": "2", "b": 3})
 
-    # Asserts FastMCP's native CallToolResult shape. Issue 5 will
-    # introduce adapter-level response normalization, at which point
-    # this assertion moves to tests/unit/test_normalization.py.
-    assert result.structured_content["result"] == 5
+    assert result["structured_content"]["result"] == 5
+    assert result["is_error"] is False
