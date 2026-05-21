@@ -5,7 +5,7 @@ import asyncio
 
 def test_tune_runs():
     m = MCPTune(model="dummy-model", mcpserver="dummy-server")
-    model, metrics = m.run()
+    model, metrics = asyncio.run(m.run())
 
     assert model is not None 
     assert "accuracy" in metrics

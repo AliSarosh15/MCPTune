@@ -1,25 +1,31 @@
-from .discovery import Tool, ToolParameter
+import asyncio
+
+from .schema import ToolSpec, ToolParameter
+from .adapters.fastmcp import FastMCPAdapter
 from .utils import build_http_requests, build_stdio_dataset
 
 class MCPTune:
-    def __init__(self, model: str, mcpserver):
+    def __init__(self, model: str, mcpserver, adapter=None):
         self.model = model
         self.mcpserver = mcpserver
+        self.adapter = adapter or FastMCPAdapter(mcpserver)
 
     async def discover(self):
         """Discover tools from the MCP server and convert them to our internal Tool representation"""
-        print("[1] Discovering tools...")
-        tools = await self.mcpserver.list_tools()
+        #print("[1] Discovering tools...")
+        #tools = await self.mcpserver.list_tools()
 
-        toolsdef = [ Tool(
-                        name=t.name, 
-                        description=t.description, 
-                        parameters=self.extract_parameters(t.parameters), 
-                        outputSchema=self.extract_output_schema(t.output_schema)
-                        ) for t in tools
-                    ]
+        return await self.adapter.discover_tools()
 
-        return toolsdef
+        #toolsdef = [ Tool(
+        #                name=t.name, 
+        #                description=t.description, 
+        #                parameters=self.extract_parameters(t.parameters), 
+        #                outputSchema=self.extract_output_schema(t.output_schema)
+        #                ) for t in tools
+        #            ]
+
+        #return toolsdef
 
     def extract_parameters(self, parameters):
         """Convert MCP server tool parameters to our internal ToolParameter representation"""
@@ -38,6 +44,9 @@ class MCPTune:
 
 
     def build_mcp_request(self, tools, method="HTTP"):
+        if asyncio.iscoroutine(tools):
+            tools = asyncio.run(tools)
+
         print("[2] Building MCP request...")
         if method == "HTTP":
             return build_http_requests(tools)
@@ -55,9 +64,9 @@ class MCPTune:
         print("[4] Evaluating model...")
         return {"accuracy": 0.9}
 
-    def run(self):
-        tools = self.discover()
-        dataset = self.build_dataset(tools)
+    async def run(self):
+        tools = await self.discover()
+        dataset = self.build_mcp_request(tools)
         model = self.train(dataset)
         metrics = self.evaluate(model)
 

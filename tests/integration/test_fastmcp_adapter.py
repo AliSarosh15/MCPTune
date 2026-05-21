@@ -93,4 +93,4 @@ async def test_call_tool(mock_server):
         }
     )
 
-    assert result == 5
+    assert result.structured_content["result"] == 5
