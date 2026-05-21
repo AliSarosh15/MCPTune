@@ -22,9 +22,10 @@ async def test_build_dataset():
     m = MCPTune(model="model", mcpserver=FastMCPServer)
 
     tools = await m.discover()
-    dataset = await m.build_mcp_request(tools)
+    dataset = await m.build_mcp_requests(tools)
     assert isinstance(dataset, list)
     assert len(dataset) == 3
+    
 
 async def test_mcp_pipeline_integration():
     server = MockMCPServer()
@@ -34,7 +35,7 @@ async def test_mcp_pipeline_integration():
     tools = await m.discover()
     assert "add" in server.list_tools()
 
-    dataset = await m.build_mcp_request(tools)
+    dataset = await m.build_mcp_requests(tools)
     assert isinstance(dataset, list)
 
     model = m.train(dataset)
