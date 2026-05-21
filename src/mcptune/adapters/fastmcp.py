@@ -30,7 +30,7 @@ class FastMCPAdapter(MCPAdapter):
             parameters = [
                 ToolParameter(
                     name=name,
-                    type=props[name].get("type", "unknown"),
+                    schema = props[name],
                     required=name in required,
                     description=props[name].get("description", "")
                 )

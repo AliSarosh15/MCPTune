@@ -5,7 +5,7 @@ from typing import Any
 @dataclass
 class ToolParameter:
     name: str
-    type: str
+    schema: dict
     required: bool
     description: str
 

@@ -31,7 +31,7 @@ class MCPTune:
         """Convert MCP server tool parameters to our internal ToolParameter representation"""
         params = []
         for param in parameters["properties"]:
-            params.append(ToolParameter(name=param, type=parameters['properties'][param]['type'], required = param in parameters['required'], description=""))
+            params.append(ToolParameter(name=param, schema=parameters, required = param in parameters['required'], description=""))
 
         return params
 
@@ -39,7 +39,7 @@ class MCPTune:
         """Convert MCP server tool output schema to our internal ToolParameter representation"""
         returnables = []
         for param in output_schema["properties"]:
-            returnables.append(ToolParameter(name=param, type=output_schema['properties'][param]['type'], required=param in output_schema['required'], description=""))
+            returnables.append(ToolParameter(name=param, schema=output_schema, required=param in output_schema['required'], description=""))
         return returnables[0] if returnables else None
 
 

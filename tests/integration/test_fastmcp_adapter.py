@@ -59,7 +59,7 @@ async def test_tool_metadata_is_extracted(mock_server):
     assert isinstance(parameter, ToolParameter)
 
     assert parameter.name == "city"
-    assert parameter.type == "string"
+    assert parameter.schema["type"] == "string"
     assert parameter.required is True
 
 

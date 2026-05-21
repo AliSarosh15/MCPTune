@@ -17,7 +17,7 @@ def build_http_requests(tools):
             "params": {
                 "name": tool.name,
                 "arguments": {
-                    param.name: f"<{param.type}>"
+                    param.name: f"<{param.schema}>"
                     for param in tool.parameters
                 }
             }
