@@ -54,8 +54,8 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401", "F403"]   # re-exports
-"tests/*"     = ["B011"]            # `assert` is the point in tests
+"__init__.py" = ["F401", "F403", "F405"]
+"tests/*"     = ["B011"]
 
 [tool.coverage.run]
 source = ["src/mcptune"]
