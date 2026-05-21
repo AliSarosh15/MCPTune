@@ -43,10 +43,7 @@ class MCPTune:
         return returnables[0] if returnables else None
 
 
-    def build_mcp_request(self, tools, method="HTTP"):
-        if asyncio.iscoroutine(tools):
-            tools = asyncio.run(tools)
-
+    async def build_mcp_request(self, tools, method="HTTP"):
         print("[2] Building MCP request...")
         if method == "HTTP":
             return build_http_requests(tools)
@@ -66,7 +63,7 @@ class MCPTune:
 
     async def run(self):
         tools = await self.discover()
-        dataset = self.build_mcp_request(tools)
+        dataset = await self.build_mcp_request(tools)
         model = self.train(dataset)
         metrics = self.evaluate(model)
 
