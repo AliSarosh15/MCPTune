@@ -1,4 +1,3 @@
-
 import json
 
 
@@ -16,11 +15,8 @@ def build_http_requests(tools):
             "method": "tools/call",
             "params": {
                 "name": tool.name,
-                "arguments": {
-                    param.name: f"<{param.schema}>"
-                    for param in tool.parameters
-                }
-            }
+                "arguments": {param.name: f"<{param.schema}>" for param in tool.parameters},
+            },
         }
 
         requests.append(json.dumps(request, indent=2))

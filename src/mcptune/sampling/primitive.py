@@ -1,10 +1,10 @@
-from .base import ArgumentSampler
 import random
 import string
 
+from .base import ArgumentSampler
+
 
 class PrimitiveSampler(ArgumentSampler):
-
     def sample(self, schema: dict):
 
         t = schema.get("type")

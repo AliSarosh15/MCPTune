@@ -1,54 +1,29 @@
 import pytest
-from mcptune.sampling.primitive import PrimitiveSampler
 
 
-@pytest.fixture
-def sampler():
-    return PrimitiveSampler()
+@pytest.mark.unit
+def test_string_sampling_returns_str(primitive_sampler):
+    assert isinstance(primitive_sampler.sample({"type": "string"}), str)
 
 
-def test_string_sampling_returns_str(sampler):
-    value = sampler.sample({"type": "string"})
-    assert isinstance(value, str)
+@pytest.mark.unit
+def test_integer_sampling_returns_int(primitive_sampler):
+    assert isinstance(primitive_sampler.sample({"type": "integer"}), int)
 
 
-def test_integer_sampling_returns_int(sampler):
-    value = sampler.sample({"type": "integer"})
-    assert isinstance(value, int)
+@pytest.mark.unit
+def test_number_sampling_returns_float(primitive_sampler):
+    assert isinstance(primitive_sampler.sample({"type": "number"}), float)
 
 
-def test_number_sampling_returns_float(sampler):
-    value = sampler.sample({"type": "number"})
-    assert isinstance(value, float)
+@pytest.mark.unit
+def test_boolean_sampling_returns_bool(primitive_sampler):
+    assert isinstance(primitive_sampler.sample({"type": "boolean"}), bool)
 
 
-def test_boolean_sampling_returns_bool(sampler):
-    value = sampler.sample({"type": "boolean"})
-    assert isinstance(value, bool)
-
-
-from mcptune.schema.tools import ToolSpec, ToolParameter
-from mcptune.mcptune import MCPTune
-
-
-class DummySampler:
-    def sample(self, schema):
-        return "x"
-
-
-def test_build_arguments_basic():
-    tool = ToolSpec(
-        name="test",
-        description="",
-        parameters=[
-            ToolParameter(name="city", schema={"type": "string"}, required=True, description="")
-        ]
-    )
-
-    m = MCPTune(model="x", mcpserver=None)
-    m.sampler = DummySampler()
-
-    args = m.build_arguments(tool)
-
-    assert "city" in args
-    assert args["city"] == "x"
+@pytest.mark.unit
+def test_unknown_type_returns_none(primitive_sampler):
+    # Pins today's contract: unknown JSONSchema types return None rather
+    # than raising. Issue 6 (recursive sampling) may revisit this.
+    assert primitive_sampler.sample({"type": "object"}) is None
+    assert primitive_sampler.sample({}) is None

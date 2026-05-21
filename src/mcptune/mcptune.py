@@ -1,12 +1,13 @@
-import asyncio
 
 import uuid
+from dataclasses import replace
 
-from .schema import ToolSpec, ToolParameter
-from .adapters.fastmcp import FastMCPAdapter
-from .utils import build_http_requests, build_stdio_dataset
 from mcptune.sampling.primitive import PrimitiveSampler
 from mcptune.schema.dataset import DatasetRow
+
+from .adapters.fastmcp import FastMCPAdapter
+from .schema import ToolSpec
+
 
 class MCPTune:
     def __init__(self, model: str, mcpserver, adapter=None):
@@ -17,20 +18,20 @@ class MCPTune:
 
     async def discover(self):
         """Discover tools from the MCP server and convert them to our internal Tool representation"""
-        #print("[1] Discovering tools...")
-        #tools = await self.mcpserver.list_tools()
+        # print("[1] Discovering tools...")
+        # tools = await self.mcpserver.list_tools()
 
         return await self.adapter.discover_tools()
 
-        #toolsdef = [ Tool(
-        #                name=t.name, 
-        #                description=t.description, 
-        #                parameters=self.extract_parameters(t.parameters), 
+        # toolsdef = [ Tool(
+        #                name=t.name,
+        #                description=t.description,
+        #                parameters=self.extract_parameters(t.parameters),
         #                outputSchema=self.extract_output_schema(t.output_schema)
         #                ) for t in tools
         #            ]
 
-        #return toolsdef
+        # return toolsdef
 
     def build_dataset(self, tools: list[ToolSpec]) -> list[DatasetRow]:
         dataset = []
@@ -40,23 +41,9 @@ class MCPTune:
 
             request = self.build_mcp_request(tool, arguments)
 
-            dataset.append(
-                DatasetRow(
-                    tool_name=tool.name,
-                    arguments=arguments,
-                    request=request
-                )
-            )
+            dataset.append(DatasetRow(tool_name=tool.name, arguments=arguments, request=request))
 
         return dataset
-    
-    def extract_parameters(self, parameters):
-        """Convert MCP server tool parameters to our internal ToolParameter representation"""
-        params = []
-        for param in parameters["properties"]:
-            params.append(ToolParameter(name=param, schema=parameters, required = param in parameters['required'], description=""))
-
-        return params
 
     def build_arguments(self, tool: ToolSpec) -> dict:
         args = {}
@@ -66,24 +53,23 @@ class MCPTune:
 
         return args
 
-    def extract_output_schema(self, output_schema):
-        """Convert MCP server tool output schema to our internal ToolParameter representation"""
-        returnables = []
-        for param in output_schema["properties"]:
-            returnables.append(ToolParameter(name=param, schema=output_schema, required=param in output_schema['required'], description=""))
-        return returnables[0] if returnables else None
-
-   
     def build_mcp_request(self, tool: ToolSpec, arguments: dict) -> dict:
         return {
             "jsonrpc": "2.0",
             "id": str(uuid.uuid4()),
             "method": "tools/call",
-            "params": {
-                "name": tool.name,
-                "arguments": arguments
-            }
+            "params": {"name": tool.name, "arguments": arguments},
         }
+
+    async def execute_dataset(self, rows: list[DatasetRow]) -> list[DatasetRow]:
+        executed = []
+        for row in rows:
+            try:
+                response = await self.adapter.call_tool(row.tool_name, row.arguments)
+                executed.append(replace(row, response=response))
+            except Exception as e:
+                executed.append(replace(row, error=f"{type(e).__name__}: {e}"))
+        return executed
 
     def train(self, dataset):
         print("[3] Training model...")
@@ -101,5 +87,3 @@ class MCPTune:
 
         print("Done:", metrics)
         return model, metrics
-    
-

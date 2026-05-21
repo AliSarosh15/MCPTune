@@ -12,7 +12,13 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = [
-    "pytest"
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
+    "hypothesis>=6.0",
+    "ruff>=0.5",
+    "mypy>=1.10",
+    "fastmcp",
 ]
 
 [tool.setuptools]
@@ -23,3 +29,44 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "unit: fast, no IO, pure logic",
+    "integration: cross-component, in-process MCP",
+    "e2e: spawns external processes, slow, opt-in",
+]
+addopts = "-m 'not e2e'"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line length handled by formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]   # re-exports
+"tests/*"     = ["B011"]            # `assert` is the point in tests
+
+[tool.coverage.run]
+source = ["src/mcptune"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]

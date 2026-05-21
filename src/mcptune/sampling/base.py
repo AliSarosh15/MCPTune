@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 
 class ArgumentSampler(ABC):
-
     @abstractmethod
     def sample(self, schema: dict) -> any:
         """

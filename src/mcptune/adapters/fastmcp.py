@@ -1,10 +1,10 @@
-from mcptune.adapters.base import MCPAdapter
-from mcptune.schema.tools import ToolSpec, ToolParameter
-
 import inspect
 
-class FastMCPAdapter(MCPAdapter):
+from mcptune.adapters.base import MCPAdapter
+from mcptune.schema.tools import ToolParameter, ToolSpec
 
+
+class FastMCPAdapter(MCPAdapter):
     def __init__(self, server):
         self.server = server
 
@@ -30,9 +30,9 @@ class FastMCPAdapter(MCPAdapter):
             parameters = [
                 ToolParameter(
                     name=name,
-                    schema = props[name],
+                    schema=props[name],
                     required=name in required,
-                    description=props[name].get("description", "")
+                    description=props[name].get("description", ""),
                 )
                 for name in props
             ]
@@ -42,21 +42,16 @@ class FastMCPAdapter(MCPAdapter):
                     name=tool.name,
                     description=tool.description,
                     parameters=parameters,
-                    raw_input_schema=schema
+                    raw_input_schema=schema,
                 )
             )
 
         return normalized
 
-    async def call_tool(
-        self,
-        tool_name: str,
-        arguments: dict
-    ) -> dict:
+    async def call_tool(self, tool_name: str, arguments: dict) -> dict:
 
         result = self.server.call_tool(tool_name, arguments)
 
         if inspect.isawaitable(result):
             return await result
         return result
-

@@ -1,5 +1,6 @@
 # tests/mcp/mock_server.py
 
+
 class MockMCPServer:
     def __init__(self):
         self.tools = {

@@ -2,7 +2,6 @@
 
 from fastmcp import FastMCP
 
-
 mcp = FastMCP("mcptune-test-server")
 
 
