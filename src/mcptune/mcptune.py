@@ -95,7 +95,7 @@ class MCPTune:
 
     async def run(self):
         tools = await self.discover()
-        dataset = await self.build_mcp_requests(tools)
+        dataset = self.build_dataset(tools)
         model = self.train(dataset)
         metrics = self.evaluate(model)
 
