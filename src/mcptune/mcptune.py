@@ -1,4 +1,5 @@
 from .discovery import Tool, ToolParameter
+from .utils import build_http_requests, build_stdio_dataset
 
 class MCPTune:
     def __init__(self, model: str, mcpserver):
@@ -36,18 +37,15 @@ class MCPTune:
         return returnables[0] if returnables else None
 
 
-    def build_dataset(self, tools):
-        print("[2] Building dataset...")
-        return [
-            Tool(
-                name="add",
-                description="Adds two integers",
-                parameters={
-                    "a": "int",
-                    "b": "int"
-                }
-            )
-        ]
+    def build_mcp_request(self, tools, method="HTTP"):
+        print("[2] Building MCP request...")
+        if method == "HTTP":
+            return build_http_requests(tools)
+        elif method == "stdio":
+            return build_stdio_dataset(tools)
+        else:
+            raise ValueError(f"Unknown dataset building method: {method}")
+        
 
     def train(self, dataset):
         print("[3] Training model...")

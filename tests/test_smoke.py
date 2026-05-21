@@ -17,6 +17,15 @@ def test_discover_tools():
     assert tools[0].name == "get_weather"
     assert tools[1].name == "calculator"
 
+
+def test_build_dataset():
+    m = MCPTune(model="model", mcpserver=FastMCPServer)
+
+    tools = asyncio.run(m.discover())
+    dataset = m.build_mcp_request(tools)
+    assert isinstance(dataset, list)
+    assert len(dataset) == 3
+
 def test_mcp_pipeline_integration():
     server = MockMCPServer()
 
@@ -25,7 +34,7 @@ def test_mcp_pipeline_integration():
     tools = m.discover()
     assert "add" in server.list_tools()
 
-    dataset = m.build_dataset(tools)
+    dataset = m.build_mcp_request(tools)
     assert isinstance(dataset, list)
 
     model = m.train(dataset)
