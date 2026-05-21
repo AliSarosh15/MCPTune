@@ -1,0 +1,36 @@
+name: Architectural discussion
+description: Propose or discuss a design / architectural change
+labels: ["discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for design proposals, refactor ideas, or open architectural questions that don't yet have a concrete bug or feature shape.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Background
+      description: What part of the system is this about? Link to relevant code or prior discussions.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal or question
+      description: What are you proposing, or what's the open question?
+    validations:
+      required: true
+
+  - type: textarea
+    id: considerations
+    attributes:
+      label: Open considerations
+      description: Trade-offs, alternatives you've already thought about, things you're unsure of.
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Suggested scope
+      description: Is this one PR or several? Are there hidden dependencies?

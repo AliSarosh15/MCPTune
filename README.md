@@ -1,115 +1,82 @@
 # MCPTune
 
-MCPTune is an open-source Python framework for generating tool-use fine-tuning datasets from Model Context Protocol (MCP) servers.
+Synthetic dataset generation and fine-tuning infrastructure for MCP-based tool use.
 
-The project explores a simple idea: MCP servers already expose structured tool definitions, parameter schemas, and execution interfaces. MCPTune uses this information to automatically construct training data for language models intended to interact reliably with external tools.
+[![CI](https://github.com/YOUR_ORG/mcptune/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_ORG/mcptune/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-The current focus of the project is infrastructure and dataset generation rather than agent orchestration.
+> ⚠️ **Early development.** APIs are unstable and may change between commits. Not yet on PyPI.
 
-## Features
+## What it does
 
-- MCP server abstraction layer
-- Mock MCP integration testing
-- Synthetic tool-use dataset generation
-- Modular training pipeline
-- Open-source contributor workflow with CI
+MCPTune connects to an [MCP](https://modelcontextprotocol.io) server, discovers its tools, generates valid synthetic invocations from each tool's JSON schema, executes them against the server, and captures the request/response pairs as a training dataset for fine-tuning tool-using language models.
 
-## Architecture
+The long-term goal is one-line dataset generation:
 
-MCPTune currently follows a simple staged pipeline:
+​```python
+from mcptune import MCPTune
 
-```text
-MCP Discovery
-    ↓
-Tool Normalization
-    ↓
-Dataset Generation
-    ↓
-Training
-    ↓
-Evaluation
-```
+tuner = MCPTune(model="base-model", mcpserver=my_server)
+model, metrics = await tuner.run()
+​```
 
-The implementation is intentionally modular so that transports, dataset generators, and training backends can evolve independently.
+## Status
 
-## Current Status
+| Capability | Status |
+|------------|--------|
+| FastMCP adapter | ✅ |
+| Tool discovery + schema normalization | ✅ |
+| Primitive argument sampling (string, int, float, bool) | ✅ |
+| Closed-loop execution + response capture | ✅ |
+| Recursive schema sampling (nested, arrays, enums) | 🚧 planned |
+| Semantic argument generation | 🚧 planned |
+| HTTP / stdio adapters | 🚧 planned |
+| Training-format emission | 🚧 planned |
+| Evaluation pipeline | 🚧 planned |
 
-MCPTune is in early development.
+## Quickstart
 
-The repository currently contains:
-- package infrastructure
-- continuous integration
-- testing framework
-- MCP protocol abstraction
-- mock MCP server integration
-- initial dataset generation pipeline
-
-Training backends and real MCP transports are planned but not yet implemented.
-
-## Installation
-
-```bash
-git clone https://github.com/<username>/MCPTune.git
-
-cd MCPTune
-
-pip install -e .[dev]
-```
-
-## Development
-
-Run tests:
-
-```bash
+​```bash
+git clone https://github.com/TomasrRodrigues/mcptune
+cd mcptune
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
 pytest
-```
+​```
 
-Run linting:
+A minimal end-to-end run against an in-memory FastMCP server:
 
-```bash
-ruff check .
-```
+​```python
+import asyncio
+from fastmcp import FastMCP
+from mcptune import MCPTune
 
-## Project Goals
+server = FastMCP("demo")
 
-The primary objective of MCPTune is to make MCP-oriented tool-use fine-tuning reproducible and accessible through a lightweight infrastructure layer.
+@server.tool
+def get_weather(city: str) -> str:
+    return f"Sunny in {city}"
 
-The project is intentionally designed around:
-- modularity
-- deterministic testing
-- transport abstraction
-- protocol-aware dataset generation
+async def main():
+    tuner = MCPTune(model="demo-model", mcpserver=server)
+    tools = await tuner.discover()
+    dataset = tuner.build_dataset(tools)
+    for row in dataset:
+        print(row)
 
-rather than autonomous agent systems or orchestration frameworks.
+asyncio.run(main())
+​```
 
-## Roadmap
+## How it's built
 
-### v0.1
-- MCP abstraction layer
-- mock server integration
-- basic dataset generation
-- OpenAI-style export format
+​```
+MCP Server  →  Adapter  →  Discovery  →  Sampler  →  Dataset Builder  →  Executor
+​```
 
-### v0.2
-- stdio transport support
-- HTTP transport support
-- schema normalization
-- Hugging Face dataset integration
+Each layer is a single-purpose module behind an interface. Transports go through adapters (`mcptune.adapters`), argument generation through samplers (`mcptune.sampling`), and orchestration lives in `mcptune.MCPTune`. The internal representation is `ToolSpec` - everything downstream of discovery operates on it, never on transport-specific types.
 
-### v0.3
-- QLoRA training backend
-- evaluation harness
-- multi-tool workflow generation
-
-## Contributing
-
-Contributions, issue reports, and design discussions are welcome.
-
-Before opening a pull request:
-- run tests locally
-- ensure linting passes
-- keep changes focused and documented
+See [CONTRIBUTING.md](CONTRIBUTING.md) for architecture details and extension points.
 
 ## License
 
-MIT License.
+MIT. See [LICENSE](LICENSE).
