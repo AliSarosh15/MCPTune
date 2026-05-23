@@ -1,0 +1,9 @@
+# CODEOWNERS for MCPTune
+# Syntax: <path-pattern>  <owner>...
+# Last matching rule wins. Owners are auto-requested for review on PRs
+# that touch matching files. Combined with the branch protection rule
+# "Require review from Code Owners", PRs cannot merge until the listed
+# owner approves them.
+
+# Default owner — applies to everything not matched by a more specific rule below.
+*  @TomasrRodrigues
